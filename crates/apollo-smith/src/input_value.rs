@@ -255,8 +255,27 @@ impl<'a> DocumentBuilder<'a> {
                         })
                         .collect::<ArbitraryResult<Vec<_>>>()?,
                 ))
+	    } else if let Some(input_ty) = doc_builder
+		.input_object_type_defs
+		.iter()
+		.find(|e| &e.name == ty.name())
+		.cloned()
+	    {
+		Ok(InputValue::Object(
+		    input_ty
+			.fields
+			.iter()
+			.map(|field_def| {
+			    Ok((
+				field_def.name.clone(),
+				doc_builder.input_value_for_type(&field_def.ty)?,
+			    ))
+			})
+			.collect::<ArbitraryResult<Vec<_>>>()?,
+		))		    
             } else {
-                todo!()
+		dbg!(ty);
+                todo!();
             }
         };
 
