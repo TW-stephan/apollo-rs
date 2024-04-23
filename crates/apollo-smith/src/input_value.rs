@@ -272,7 +272,21 @@ impl<'a> DocumentBuilder<'a> {
 			    ))
 			})
 			.collect::<ArbitraryResult<Vec<_>>>()?,
-		))		    
+		))
+	    } else if let Some(_scalar_ty) = doc_builder
+		.scalar_type_defs
+		.iter()
+		.find(|e| &e.name == ty.name())
+		.cloned()
+	    {
+		let selector = doc_builder.u.int_in_range(0..=3usize)?;
+		Ok(match selector {
+		    0 => InputValue::Int(doc_builder.u.arbitrary()?),
+		    1 => InputValue::Float(doc_builder.finite_f64()?),
+		    2 => InputValue::String(doc_builder.limited_string(40)?),
+		    3 => InputValue::Boolean(doc_builder.u.arbitrary()?),
+		    _ => unreachable!(),
+		})
             } else {
 		dbg!(ty);
                 todo!();
